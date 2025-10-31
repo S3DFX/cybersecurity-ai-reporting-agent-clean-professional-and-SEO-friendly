@@ -1,0 +1,68 @@
+{
+  "name": "Cybersecurity AI Analyst",
+  "nodes": [
+    {
+      "id": "WebhookTrigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [450, 250],
+      "parameters": {
+        "path": "security-analysis",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {
+          "responseContentType": "application/json"
+        }
+      }
+    },
+    {
+      "id": "AIAgent",
+      "name": "AI Cybersecurity Agent",
+      "type": "n8n-nodes-base.aiAgent",
+      "typeVersion": 1,
+      "position": [750, 250],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "instructions": "You are a cybersecurity analysis AI. Your job is to:\n1. Parse security scan input like Nmap, CVE feeds, OSINT, config audits\n2. Identify vulnerabilities, misconfigurations, exposed services, and risks\n3. Generate a structured security report with:\n- Executive summary\n- Findings list\n- Severity ratings\n- Remediation plan\n- Asset summary\n- Playbook actions\n4. If no data provided, tell the user to submit valid formatted payload",
+        "inputDataField": "json",
+        "outputFormat": "json"
+      }
+    },
+    {
+      "id": "ReturnData",
+      "name": "Return Security Report",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 250],
+      "parameters": {
+        "options": {},
+        "responseBody": "={{ $json }}"
+      }
+    }
+  ],
+  "connections": {
+    "WebhookTrigger": {
+      "main": [
+        [
+          {
+            "node": "AI Cybersecurity Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Cybersecurity Agent": {
+      "main": [
+        [
+          {
+            "node": "Return Security Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
